@@ -1,0 +1,59 @@
+service: stream-authorizer
+frameworkVersion: '3'
+
+provider:
+    name: aws
+    runtime: nodejs14.x
+    memorySize: 256
+    region: eu-west-1
+    stage: ${opt:stage, 'dev'}
+    environment:
+        DYNAMODB_TABLE: ${self:service}-${sls:stage}
+    iam:
+        role:
+            statements:
+                - Effect: Allow
+                  Action:
+                      - dynamodb:PutItem
+                      - dynamodb:Query
+                      - dynamodb:Scan
+                      - dynamodb:UpdateItem
+                      - dynamodb:GetItem
+                      - dynamodb:DeleteItem
+                  Resource:
+                      - !Sub arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${self:provider.environment.DYNAMODB_TABLE}
+
+resources:
+    Resources:
+        TodosTable:
+            Type: AWS::DynamoDB::Table
+            Properties:
+                TableName: ${self:provider.environment.DYNAMODB_TABLE}
+                BillingMode: PAY_PER_REQUEST
+                AttributeDefinitions:
+                    - AttributeName: userId
+                      AttributeType: S
+                KeySchema:
+                    - AttributeName: userId
+                      KeyType: HASH
+
+# functions:
+#     hello:
+#         handler: src/functions/hello
+
+plugins:
+    - serverless-esbuild
+    - serverless-offline
+package:
+  individually: true
+custom:
+    esbuild:
+        bundle: true
+        minify: false
+        sourcemap: true
+        exclude:
+            - 'aws-sdk'
+        target: 'node14'
+        define: {}
+        platform: 'node'
+        concurrency: 10
