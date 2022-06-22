@@ -30,6 +30,17 @@ describe('DynamoDb Client', () => {
             TableName: tableName,
         });
 
-        expect(result.Item).toBe(item);
+        expect(result).toBe(item);
+    });
+
+    test('get method returns correct item', async () => {
+        const params = {
+            Key: { userId: 'madeuphash' },
+            TableName: tableName,
+        };
+
+        const result = await dynamodb.get(params);
+
+        expect(result).toHaveProperty('userId', params.Key.userId);
     });
 });

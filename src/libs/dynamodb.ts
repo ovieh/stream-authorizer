@@ -1,18 +1,22 @@
-import DynamoDB, { DocumentClient } from 'aws-sdk/clients/dynamodb';
-import { PromiseResult } from 'aws-sdk/lib/request';
+import DynamoDB, {
+    DocumentClient,
+    PutItemInputAttributeMap,
+} from 'aws-sdk/clients/dynamodb';
 import dynamoDbTestConfig from '../../test/jest-dynalite-config';
 
 interface IDynamoDB {
-    put(item: DynamoDB.DocumentClient.PutItemInput): unknown;
+    put(
+        item: DynamoDB.DocumentClient.PutItemInput
+    ): Promise<PutItemInputAttributeMap>;
+    get(
+        item: DynamoDB.DocumentClient.GetItemInput
+    ): Promise<PutItemInputAttributeMap>;
 }
 
 export class DynamoDBClient implements IDynamoDB {
     private client: DocumentClient;
-    private tableName: string;
-    // private config: DocumentClientConfig;
 
-    constructor(tableName: string) {
-        this.tableName = tableName;
+    constructor() {
 
         if (process.env.JEST_WORKER_ID) {
             this.client = new DynamoDB.DocumentClient({
@@ -29,9 +33,22 @@ export class DynamoDBClient implements IDynamoDB {
     }
     async put(item: DynamoDB.DocumentClient.PutItemInput) {
         try {
-            console.log(item);
             await this.client.put(item).promise();
-            return item;
+            return item.Item;
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
+    async get(item: DynamoDB.DocumentClient.GetItemInput) {
+        try {
+            const result = await this.client.get(item).promise();
+
+            if (result.Item) {
+                return result.Item;
+            } else {
+                return null;
+            }
         } catch (error) {
             console.error(error);
         }

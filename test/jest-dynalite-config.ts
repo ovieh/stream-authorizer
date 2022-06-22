@@ -7,8 +7,13 @@ export default {
                 { AttributeName: 'userId', AttributeType: 'S' },
             ],
             BillingMode: 'PAY_PER_REQUEST',
+            data: [
+                {
+                    userId: 'madeuphash',
+                    concurrentSessions: 1,
+                },
+            ],
         },
     ],
     basePort: 3000,
 };
-
