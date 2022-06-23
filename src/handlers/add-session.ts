@@ -57,21 +57,12 @@ const streamAuthorizer: StreamAuthorizerHandler = async (
             201
         );
     } else {
-        callback(
-            null,
-            formatJSONResponse(
-                {
-                    message: 'Too many active streams',
-                },
-                401
-            )
-        );
-        // return formatJSONResponse(
-        //     {
-        //         message: 'Too many active streams',
-        //     },
-        //     401
-        // ); // TODO: replace text with something
+        return formatJSONResponse(
+            {
+                message: 'Too many active streams',
+            },
+            401
+        ); // TODO: replace text with something
     }
 };
 

@@ -38,11 +38,11 @@ resources:
                       KeyType: HASH
 
 functions:
-    stream-authorizer:
-        handler: src/handlers/stream-authorizer.handler
+    add-session:
+        handler: src/handlers/add-session.handler
         events:
             - http:
-                path: stream-authorizer
+                path: stream-authorizer/add
                 method: POST
                 request:
                     schemas:
@@ -51,7 +51,7 @@ functions:
         handler: src/handlers/remove-session.handler
         events:
             - http:
-                path: remove-session
+                path: stream-authorizer/remove
                 method: POST
                 request:
                     schemas:

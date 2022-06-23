@@ -1,5 +1,5 @@
 import { Context } from 'aws-lambda';
-import { handler } from '../stream-authorizer';
+import { handler } from '../add-session';
 import { startDb, stopDb, createTables, deleteTables } from 'jest-dynalite';
 
 beforeAll(startDb);
