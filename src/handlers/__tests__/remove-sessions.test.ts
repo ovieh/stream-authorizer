@@ -50,21 +50,4 @@ describe('Remove session handler', () => {
         expect(response.statusCode).toBe(200);
     });
 
-    // it('returns a statusCode of 401 when the user has more than 3 than concurrent streams', async () => {
-    //     const response = await handler(
-    //         { body: { userId: 'toomanystreams' } },
-    //         context
-    //     );
-
-    //     expect(response.statusCode).toBe(401);
-    // });
-
-    // it('returns a statusCode of 201 when the user has less than 3 concurrent streams', async () => {
-    //     const response = await handler(
-    //         { body: { userId: 'madeuphash' } },
-    //         context
-    //     );
-
-    //     expect(response.statusCode).toBe(201);
-    // });
 });

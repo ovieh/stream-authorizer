@@ -8,7 +8,6 @@ import {
 import { DynamoDBClient } from '../libs/dynamodb';
 import { StreamAuthorizerEvent, UserSession } from '../types';
 
-
 type StreamAuthorizerHandler = Handler<
     APIGatewayProxyEventV2 & StreamAuthorizerEvent,
     APIGatewayProxyResultV2
@@ -46,9 +45,12 @@ const streamAuthorizer: StreamAuthorizerHandler = async (event) => {
 
         const updatedItem = await dynamodb.put(params);
 
-        return formatJSONResponse({
-            message: updatedItem,
-        }, 201);
+        return formatJSONResponse(
+            {
+                message: updatedItem,
+            },
+            201
+        );
     } else {
         return formatJSONResponse(
             {
