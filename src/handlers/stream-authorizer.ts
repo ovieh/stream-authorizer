@@ -1,16 +1,17 @@
 import { formatJSONResponse } from '../libs/api-gateway';
 import { middyfy } from '../libs/lambda';
 import {
-    APIGatewayProxyEventV2,
-    APIGatewayProxyResultV2,
+    APIGatewayProxyEvent,
+    APIGatewayProxyResult,
+    APIGatewayAuthorizerEvent,
     Handler,
 } from 'aws-lambda';
 import { DynamoDBClient } from '../libs/dynamodb';
 import { StreamAuthorizerEvent, UserSession } from '../types';
 
 type StreamAuthorizerHandler = Handler<
-    APIGatewayProxyEventV2 & StreamAuthorizerEvent,
-    APIGatewayProxyResultV2
+    APIGatewayProxyEvent & StreamAuthorizerEvent,
+    APIGatewayProxyResult
 >;
 
 const dynamodb = new DynamoDBClient();
@@ -18,7 +19,11 @@ const dynamodb = new DynamoDBClient();
 // TODO: Replace with environment variable
 const tableName = 'stream-authorizer-dev';
 
-const streamAuthorizer: StreamAuthorizerHandler = async (event) => {
+const streamAuthorizer: StreamAuthorizerHandler = async (
+    event,
+    context,
+    callback
+) => {
     const { userId } = event.body;
 
     const params = {
@@ -52,12 +57,21 @@ const streamAuthorizer: StreamAuthorizerHandler = async (event) => {
             201
         );
     } else {
-        return formatJSONResponse(
-            {
-                message: 'Too many active streams',
-            },
-            401
-        ); // TODO: replace text with something
+        callback(
+            null,
+            formatJSONResponse(
+                {
+                    message: 'Too many active streams',
+                },
+                401
+            )
+        );
+        // return formatJSONResponse(
+        //     {
+        //         message: 'Too many active streams',
+        //     },
+        //     401
+        // ); // TODO: replace text with something
     }
 };
 

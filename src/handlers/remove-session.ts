@@ -1,18 +1,17 @@
 import { formatJSONResponse } from '../libs/api-gateway';
 import { middyfy } from '../libs/lambda';
 import {
-    APIGatewayProxyEventV2,
-    APIGatewayProxyResultV2,
+    APIGatewayProxyEvent,
+    APIGatewayProxyResult,
     Handler,
 } from 'aws-lambda';
 import { DynamoDBClient } from '../libs/dynamodb';
 import { StreamAuthorizerEvent, UserSession } from '../types';
 
 type RemoveSessionHandler = Handler<
-    APIGatewayProxyEventV2 & StreamAuthorizerEvent,
-    APIGatewayProxyResultV2
+APIGatewayProxyEvent & StreamAuthorizerEvent,
+APIGatewayProxyResult
 >;
-
 const dynamodb = new DynamoDBClient();
 
 // TODO: Replace with environment variable
