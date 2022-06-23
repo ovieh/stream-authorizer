@@ -10,13 +10,14 @@ afterEach(deleteTables);
 
 afterAll(stopDb);
 
-const dynamodb = new DynamoDBClient('todo-serverless-dev');
+const dynamodb = new DynamoDBClient();
 
 const item: UserSession = {
     userId: nanoid(),
     concurrentSessions: 1,
 };
 
+// TODO: Replace with environment variable
 const tableName = 'stream-authorizer-dev';
 
 describe('DynamoDb Client', () => {

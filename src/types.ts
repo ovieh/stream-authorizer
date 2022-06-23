@@ -3,4 +3,10 @@ type UserSession = {
     concurrentSessions: number;
 };
 
-export { UserSession };
+type StreamAuthorizerEvent = {
+    body: {
+        userId: string;
+    };
+};
+
+export { UserSession, StreamAuthorizerEvent };

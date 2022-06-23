@@ -36,7 +36,7 @@ export class DynamoDBClient implements IDynamoDB {
             await this.client.put(item).promise();
             return item.Item;
         } catch (error) {
-            console.error(error);
+            console.error(JSON.stringify(error, null, 2));
         }
     }
 

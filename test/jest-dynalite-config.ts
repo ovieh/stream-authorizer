@@ -12,6 +12,10 @@ export default {
                     userId: 'madeuphash',
                     concurrentSessions: 1,
                 },
+                {
+                    userId: 'toomanystreams',
+                    concurrentSessions: 3,
+                },
             ],
         },
     ],

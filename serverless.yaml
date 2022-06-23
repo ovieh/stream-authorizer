@@ -37,9 +37,16 @@ resources:
                     - AttributeName: userId
                       KeyType: HASH
 
-# functions:
-#     hello:
-#         handler: src/functions/hello
+functions:
+    stream-authorizer:
+        handler: src/handlers/stream-authorizer.handler
+        events:
+            - http:
+                path: stream-authorizer
+                method: POST
+                request:
+                    schemas:
+                        application/json: ${file(src/libs/schemas/stream-authorizer-schema.json)} 
 
 plugins:
     - serverless-esbuild
