@@ -52,7 +52,7 @@ functions:
         events:
             - http:
                 path: remove-session
-                method: DELETE
+                method: POST
                 request:
                     schemas:
                         application/json: ${file(src/libs/schemas/stream-authorizer-schema.json)} 
