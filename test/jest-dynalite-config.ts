@@ -16,6 +16,10 @@ export default {
                     userId: 'toomanystreams',
                     concurrentSessions: 3,
                 },
+                {
+                    userId: 'nostreams',
+                    concurrentSessions: 0,
+                }
             ],
         },
     ],

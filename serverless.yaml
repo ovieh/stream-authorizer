@@ -47,6 +47,15 @@ functions:
                 request:
                     schemas:
                         application/json: ${file(src/libs/schemas/stream-authorizer-schema.json)} 
+    remove-session:
+        handler: src/handlers/remove-session.handler
+        events:
+            - http:
+                path: remove-session
+                method: DELETE
+                request:
+                    schemas:
+                        application/json: ${file(src/libs/schemas/stream-authorizer-schema.json)} 
 
 plugins:
     - serverless-esbuild
