@@ -23,12 +23,9 @@ const tableName = 'stream-authorizer-dev';
 const streamAuthorizer: StreamAuthorizerHandler = async (event, context) => {
     // add relevant event info to log (i.e. request id)
     log.options.meta = {
-
         functionName: context.functionName,
-    
-        requestId: context.awsRequestId
-    
-      };
+        requestId: context.awsRequestId,
+    };
 
     const { userId } = event.body;
 
