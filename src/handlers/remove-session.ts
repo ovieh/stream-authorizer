@@ -7,17 +7,27 @@ import {
 } from 'aws-lambda';
 import { DynamoDBClient } from '../libs/dynamodb';
 import { StreamAuthorizerEvent, UserSession } from '../types';
+import log from 'lambda-log';
 
 type RemoveSessionHandler = Handler<
-APIGatewayProxyEvent & StreamAuthorizerEvent,
-APIGatewayProxyResult
+    APIGatewayProxyEvent & StreamAuthorizerEvent,
+    APIGatewayProxyResult
 >;
 const dynamodb = new DynamoDBClient();
 
 // TODO: Replace with environment variable
 const tableName = 'stream-authorizer-dev';
 
-const removeSession: RemoveSessionHandler = async (event) => {
+const removeSession: RemoveSessionHandler = async (event, context) => {
+    // add relevant event info to log (i.e. request id)
+    log.options.meta = {
+
+        functionName: context.functionName,
+    
+        requestId: context.awsRequestId
+    
+      };
+
     const { userId } = event.body;
 
     const params = {
@@ -25,9 +35,16 @@ const removeSession: RemoveSessionHandler = async (event) => {
         TableName: tableName,
     };
 
-    const result = (await dynamodb.get(params)) as UserSession;
+    let result: UserSession;
+
+    try {
+        result = (await dynamodb.get(params)) as UserSession;
+    } catch (error) {
+        log.error(error);
+    }
 
     if (!result) {
+        log.info(`userId: ${userId} could not be found`);
         return formatJSONResponse({ message: 'User session not found' }, 404);
     }
 
@@ -36,12 +53,16 @@ const removeSession: RemoveSessionHandler = async (event) => {
 
         const item = { ...result, concurrentSessions: updatedSessionCount };
 
-        const updatedItem = await dynamodb.put({
-            Item: item,
-            TableName: tableName,
-        });
+        try {
+            const updatedItem = await dynamodb.put({
+                Item: item,
+                TableName: tableName,
+            });
 
-        return formatJSONResponse({ message: updatedItem }, 201);
+            return formatJSONResponse({ message: updatedItem }, 201);
+        } catch (error) {
+            log.error(error);
+        }
     } else {
         return formatJSONResponse({ message: result }, 200);
     }

@@ -3,6 +3,7 @@ import DynamoDB, {
     PutItemInputAttributeMap,
 } from 'aws-sdk/clients/dynamodb';
 import dynamoDbTestConfig from '../../test/jest-dynalite-config';
+import log from 'lambda-log';
 
 interface IDynamoDB {
     put(
@@ -17,7 +18,6 @@ export class DynamoDBClient implements IDynamoDB {
     private client: DocumentClient;
 
     constructor() {
-
         if (process.env.JEST_WORKER_ID) {
             this.client = new DynamoDB.DocumentClient({
                 ...(process.env.MOCK_DYNAMODB_ENDPOINT && {
@@ -36,7 +36,7 @@ export class DynamoDBClient implements IDynamoDB {
             await this.client.put(item).promise();
             return item.Item;
         } catch (error) {
-            console.error(JSON.stringify(error, null, 2));
+            log.error('Error putting item from DynamoDB', error);
         }
     }
 
@@ -50,7 +50,7 @@ export class DynamoDBClient implements IDynamoDB {
                 return null;
             }
         } catch (error) {
-            console.error(error);
+            log.error('Error getting item from DynamoDB', error);
         }
     }
 }

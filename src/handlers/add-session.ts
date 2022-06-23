@@ -6,6 +6,7 @@ import {
     APIGatewayAuthorizerEvent,
     Handler,
 } from 'aws-lambda';
+import log from 'lambda-log';
 import { DynamoDBClient } from '../libs/dynamodb';
 import { StreamAuthorizerEvent, UserSession } from '../types';
 
@@ -19,11 +20,16 @@ const dynamodb = new DynamoDBClient();
 // TODO: Replace with environment variable
 const tableName = 'stream-authorizer-dev';
 
-const streamAuthorizer: StreamAuthorizerHandler = async (
-    event,
-    context,
-    callback
-) => {
+const streamAuthorizer: StreamAuthorizerHandler = async (event, context) => {
+    // add relevant event info to log (i.e. request id)
+    log.options.meta = {
+
+        functionName: context.functionName,
+    
+        requestId: context.awsRequestId
+    
+      };
+
     const { userId } = event.body;
 
     const params = {
@@ -31,16 +37,27 @@ const streamAuthorizer: StreamAuthorizerHandler = async (
         TableName: tableName,
     };
 
-    const result = (await dynamodb.get(params)) as UserSession;
+    let result: UserSession;
+
+    try {
+        result = (await dynamodb.get(params)) as UserSession;
+    } catch (error) {
+        log.error(error);
+    }
 
     if (!result) {
         const item: UserSession = { userId: userId, concurrentSessions: 1 };
         const params = { Item: item, TableName: tableName };
-        const createdItem = await dynamodb.put(params);
 
-        return formatJSONResponse({
-            message: createdItem,
-        });
+        try {
+            const createdItem = await dynamodb.put(params);
+
+            return formatJSONResponse({
+                message: createdItem,
+            });
+        } catch (error) {
+            log.error(error);
+        }
     } else if (result.concurrentSessions < 3) {
         // TODO: replace hardcoded 3 with env var
         const updatedSessionCount = (result.concurrentSessions += 1);
@@ -50,12 +67,16 @@ const streamAuthorizer: StreamAuthorizerHandler = async (
 
         const updatedItem = await dynamodb.put(params);
 
-        return formatJSONResponse(
-            {
-                message: updatedItem,
-            },
-            201
-        );
+        try {
+            return formatJSONResponse(
+                {
+                    message: updatedItem,
+                },
+                201
+            );
+        } catch (error) {
+            log.error(error);
+        }
     } else {
         return formatJSONResponse(
             {
