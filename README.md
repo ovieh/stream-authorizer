@@ -24,9 +24,9 @@ The two endpoints take identical inputs:
 
 ### To test locally
 
-In order to test the stream-authorizer function locally, run the following command:
+In order to test the add-session function locally, run the following command:
 
--   `npx sls invoke local -f stream-authorizer --path src/mocks/stream-authorizer-mock.json`
+-   `npx sls invoke local -f add-session --path src/mocks/stream-authorizer-mock.json`
 
 In order to test the remove-session function locally, run the following command:
 
